@@ -1,0 +1,6 @@
+psycopg2-binary==2.9.3
+pytest==7.2.2
+python-dotenv==1.0.0
+django-split-settings==1.2.00
+pydantic==1.10.7
+elasticsearch==8.7.0

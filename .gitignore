@@ -1,0 +1,6 @@
+*.env
+*.pyc
+*.csv
+storage.json
+config.json
+etl-venv/*
