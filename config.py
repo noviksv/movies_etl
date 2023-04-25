@@ -1,7 +1,6 @@
 import json
-
-from pydantic import BaseModel
-
+from pydantic import BaseModel, Field, validator
+from typing import Type
 
 class PostgresConfig(BaseModel):
     db_host: str
@@ -16,15 +15,53 @@ class ElasticConfig(BaseModel):
     els_port: int
 
 
+class TransferList(BaseModel):
+    transfer_name: str
+    sql_query: str
+    es_index: str
+    sleep_time: int
+    batch_size: int
+    pydantic_class: str
+
+
 class AppConfig(BaseModel):
     app_name: str
     app_version: float
     postgres_settings: PostgresConfig
     elastic_settings: ElasticConfig
-    sql_query: str
-    batch_size: int
-    sleep_time: int
+    transfer_list: list[TransferList]
     loglevel: str
+
+
+class Doc(BaseModel):
+    id: str = Field('id')
+    imdb_rating: float | None = Field('imdb_rating')
+    genre: list[str] = Field('genre')
+    title: str = Field("title")
+    description: str | None = Field("description")
+    director: list[str | None] | None = Field("director")
+    actors_names: list[str | None] | None = Field("actors_names")
+    writers_names: list[ str | None] | None = Field("writers_names")
+    actors: list[dict | None] | None =Field("actors")
+    writers: list [dict | None] | None = Field("writers")
+    
+        
+    @validator('actors', pre=True)
+    def parse_actors(cls, value):
+        return json.loads(value)
+    
+    @validator('writers', pre=True)
+    def parse_writers(cls, value):
+        return json.loads(value)
+    
+    @validator('director', pre=True)
+    def parse_director(cls, value):
+        return value if value[0] is not None else []
+
+
+class Person(BaseModel):
+    id: str = Field('id')
+    full_name: str | None = Field('full_name')
 
 
 def read_config_file(file_path: str) -> AppConfig:
@@ -32,3 +69,9 @@ def read_config_file(file_path: str) -> AppConfig:
         config_data = json.load(f)
     return AppConfig(**config_data)
 
+
+def create_model_instance(model_name: str) -> Type[BaseModel]:
+    model_class = globals().get(model_name)
+    if not model_class or not issubclass(model_class, BaseModel):
+        raise ValueError(f"{model_name} is not a valid Pydantic model class.")
+    return model_class(name="example")
