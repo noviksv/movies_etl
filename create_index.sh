@@ -53,8 +53,24 @@ curl -XPUT http://localhost:9200/movies -H 'Content-Type: application/json' -d'
       "imdb_rating": {
         "type": "float"
       },
+      "creation_date": {
+        "type": "date"
+      },
       "genre": {
         "type": "keyword"
+      },
+      "genres": {
+        "type": "nested",
+        "dynamic": "strict",
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "ru_en"
+          }
+        }
       },
       "title": {
         "type": "text",
@@ -80,6 +96,19 @@ curl -XPUT http://localhost:9200/movies -H 'Content-Type: application/json' -d'
       "writers_names": {
         "type": "text",
         "analyzer": "ru_en"
+      },
+      "directors": {
+        "type": "nested",
+        "dynamic": "strict",
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "ru_en"
+          }
+        }
       },
       "actors": {
         "type": "nested",

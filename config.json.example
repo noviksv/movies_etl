@@ -3,16 +3,32 @@
     "app_version": 1.2,
     "loglevel": "DEBUG",
     "postgres_settings": {
-        "db_host": "db",
+        "db_host": "localhost",
         "db_name": "movies_database",
         "db_user": "app",
         "db_password": "123qwe",
         "db_port": 5432
     },
-    "elastic_settings":{
-        "els_host": "es",
-        "els_port": 9200 },
-    "batch_size" : 100,
-    "sql_query": "select fw.id,rating imdb_rating, array_agg(distinct g.name)  genre \n ,title \n ,fw.description \n ,array_agg(distinct p.full_name ) director \n ,array_agg(distinct p2.full_name ) actors_names \n ,array_agg(distinct p3.full_name )  writers_names \n ,concat('[', string_agg(DISTINCT json_build_object('id', p2.id, 'name', p2.full_name)#>> '{{}}',','), ']') AS actors \n ,concat('[', string_agg(DISTINCT json_build_object('id', p3.id, 'name', p3.full_name)#>> '{{}}',','), ']') AS writers \n from \"content\".film_work fw \n left join \"content\".genre_film_work gfw on fw.id=gfw.film_work_id  \n left join \"content\".genre g on gfw.genre_id =g.id  \n left join  \"content\".person_film_work pfw on fw.id=pfw.film_work_id and pfw.\"role\"='director' \n left join  \"content\".person p on pfw.person_id=p.id  \n left join  \"content\".person_film_work pfw2 on fw.id=pfw2.film_work_id and pfw2.\"role\"='actor' \n left join  \"content\".person p2 on pfw2.person_id=p2.id  \n left join  \"content\".person_film_work pfw3 on fw.id=pfw3.film_work_id and pfw3.\"role\"='writer' \n left join  \"content\".person p3 on pfw3.person_id=p3.id  \n where 1=1  \n GROUP BY 1 \n HAVING GREATEST(max(fw.updated_at), max(gfw.created_at),  max(g.updated_at),max(pfw.created_at), max(p.created_at)  \n ,max(pfw2.created_at), max(p2.created_at),max(pfw3.created_at), max(p3.created_at)) > '{kwargs[last_max_ts]}' ",
-    "sleep_time": 5
-    }
+    "elastic_settings": {
+        "els_host": "localhost",
+        "els_port": 9200
+    },
+    "transfer_list": [
+        {
+            "transfer_name": "query1",
+            "sql_query": "select fw.id,rating imdb_rating, array_agg(distinct g.name)  genre \n ,title \n ,fw.description \n ,creation_date \n , array_agg(distinct p.full_name ) director \n ,array_agg(distinct p2.full_name ) actors_names \n ,array_agg(distinct p3.full_name )  writers_names \n ,concat('[', string_agg(DISTINCT json_build_object('id', p.id, 'name', p.full_name)#>> '{{}}',','), ']') AS directors \n ,concat('[', string_agg(DISTINCT json_build_object('id', p2.id, 'name', p2.full_name)#>> '{{}}',','), ']') AS actors \n ,concat('[', string_agg(DISTINCT json_build_object('id', p3.id, 'name', p3.full_name)#>> '{{}}',','), ']') AS writers  ,concat('[', string_agg(DISTINCT json_build_object('id', g.id, 'name', g.name)#>> '{{}}',','), ']') AS genres \n from \"content\".film_work fw \n left join \"content\".genre_film_work gfw on fw.id=gfw.film_work_id  \n left join \"content\".genre g on gfw.genre_id =g.id  \n left join  \"content\".person_film_work pfw on fw.id=pfw.film_work_id and pfw.\"role\"='director' \n left join  \"content\".person p on pfw.person_id=p.id  \n left join  \"content\".person_film_work pfw2 on fw.id=pfw2.film_work_id and pfw2.\"role\"='actor' \n left join  \"content\".person p2 on pfw2.person_id=p2.id  \n left join  \"content\".person_film_work pfw3 on fw.id=pfw3.film_work_id and pfw3.\"role\"='writer' \n left join  \"content\".person p3 on pfw3.person_id=p3.id  \n where 1=1  \n GROUP BY 1 \n HAVING GREATEST(max(fw.updated_at), max(gfw.created_at),  max(g.updated_at),max(pfw.created_at), max(p.created_at)  \n ,max(pfw2.created_at), max(p2.created_at),max(pfw3.created_at), max(p3.created_at)) > '{kwargs[last_max_ts]}' ",
+            "es_index": "movies",
+            "pydantic_class":"Doc", 
+            "sleep_time": 10,
+            "batch_size": 1000
+        },
+        {
+            "transfer_name": "query2",
+            "sql_query": "Select id,full_name,concat('[',string_agg(xc#>> '{{}}',','), ']') films from (select p.id id,p.full_name,fw.id film_id,json_build_object('id',fw.id  ,'roles', array_agg(distinct pfw.role )) xc  from content.person p left join  \"content\".person_film_work pfw on pfw.person_id=p.id left join  \"content\".film_work fw on fw.id=pfw.film_work_id group by 1,2,3 HAVING GREATEST(max(p.updated_at),max(pfw.created_at),max(fw.updated_at))>'{kwargs[last_max_ts]}')s group by 1,2",
+            "es_index": "persons",
+            "pydantic_class":"Person", 
+            "sleep_time": 10,
+            "batch_size": 1000
+        }
+    ]
+}
