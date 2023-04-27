@@ -29,7 +29,12 @@ def extract_data(config : AppConfig, transfer_number, **kwargs):
                     logging.debug(row)
                     logging.exception('{0}'.format(e))
 
-                yield {**{'_id': row['id']}, **doc.dict()}
+                doc_temp = doc.dict()
+                doc_temp["_id"] = row['id']
+                if "uuid" in doc_temp.keys():
+                    doc_temp["UUID"] = doc_temp.pop("uuid")
+
+                yield doc_temp
 
 
 @backoff()

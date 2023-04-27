@@ -71,7 +71,7 @@ class Doc(BaseModel):
 
 
 class Person(BaseModel):
-    id: str = Field('id')
+    uuid: str = Field('id')
     full_name: str | None = Field('full_name')
     films: list [dict | None] | None = Field('films')
 
