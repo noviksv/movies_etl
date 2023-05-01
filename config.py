@@ -80,6 +80,10 @@ class Person(BaseModel):
         return json.loads(value)
 
 
+class Genre(BaseModel):
+    uuid: str = Field('id')
+    name: str | None = Field('name')
+
 
 def read_config_file(file_path: str) -> AppConfig:
     with open(file_path, "r") as f:
