@@ -33,7 +33,7 @@
     },
         {
             "transfer_name": "query3",
-            "sql_query": "select distinct id, name from \"content\".genre",
+            "sql_query": "select distinct id,id UUID, name from \"content\".genre where updated_at>'{kwargs[last_max_ts]}'",
             "es_index": "persons",
             "pydantic_class":"Genre", 
             "sleep_time": 10,
