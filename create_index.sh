@@ -47,7 +47,7 @@ curl -XPUT http://es:9200/movies -H 'Content-Type: application/json' -d'
   "mappings": {
     "dynamic": "strict",
     "properties": {
-      "id": {
+      "uuid": {
         "type": "keyword"
       },
       "imdb_rating": {
@@ -63,10 +63,10 @@ curl -XPUT http://es:9200/movies -H 'Content-Type: application/json' -d'
         "type": "nested",
         "dynamic": "strict",
         "properties": {
-          "id": {
+          "uuid": {
             "type": "keyword"
           },
-          "name": {
+          "full_name": {
             "type": "text",
             "analyzer": "ru_en"
           }
@@ -101,10 +101,10 @@ curl -XPUT http://es:9200/movies -H 'Content-Type: application/json' -d'
         "type": "nested",
         "dynamic": "strict",
         "properties": {
-          "id": {
+          "uuid": {
             "type": "keyword"
           },
-          "name": {
+          "full_name": {
             "type": "text",
             "analyzer": "ru_en"
           }
@@ -114,10 +114,10 @@ curl -XPUT http://es:9200/movies -H 'Content-Type: application/json' -d'
         "type": "nested",
         "dynamic": "strict",
         "properties": {
-          "id": {
+          "uuid": {
             "type": "keyword"
           },
-          "name": {
+          "full_name": {
             "type": "text",
             "analyzer": "ru_en"
           }
@@ -127,10 +127,10 @@ curl -XPUT http://es:9200/movies -H 'Content-Type: application/json' -d'
         "type": "nested",
         "dynamic": "strict",
         "properties": {
-          "id": {
+          "uuid": {
             "type": "keyword"
           },
-          "name": {
+          "full_name": {
             "type": "text",
             "analyzer": "ru_en"
           }
@@ -143,6 +143,7 @@ curl -XPUT http://es:9200/movies -H 'Content-Type: application/json' -d'
 
 
 curl -X DELETE "es:9200/persons?pretty"
+
 
 
 curl -XPUT http://es:9200/persons -H 'Content-Type: application/json' -d'
@@ -190,7 +191,7 @@ curl -XPUT http://es:9200/persons -H 'Content-Type: application/json' -d'
   "mappings": {
     "dynamic": "strict",
     "properties": {
-      "UUID": {
+      "uuid": {
         "type": "keyword"
       },
       "full_name": {
@@ -206,13 +207,19 @@ curl -XPUT http://es:9200/persons -H 'Content-Type: application/json' -d'
         "type": "nested",
         "dynamic": "strict",
         "properties": {
-          "UUID": {
+          "uuid": {
             "type": "keyword"
           },
           "roles": {
             "type": "text",
             "analyzer": "ru_en"
-          }
+          },
+          "title": {
+            "type": "text",
+            "analyzer": "ru_en"
+          },
+          "imdb_rating": {
+            "type": "float"
           }
         }
       }
@@ -221,6 +228,7 @@ curl -XPUT http://es:9200/persons -H 'Content-Type: application/json' -d'
   }
 }
 '
+
 
 
 curl -X DELETE "es:9200/genres?pretty"
@@ -271,7 +279,7 @@ curl -XPUT http://es:9200/genres -H 'Content-Type: application/json' -d'
   "mappings": {
     "dynamic": "strict",
     "properties": {
-      "UUID": {
+      "uuid": {
         "type": "keyword"
       },
       "name": {

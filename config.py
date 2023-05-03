@@ -33,8 +33,8 @@ class AppConfig(BaseModel):
     loglevel: str
 
 
-class Doc(BaseModel):
-    id: str = Field('id')
+class Film(BaseModel):
+    uuid: str = Field('uuid')
     imdb_rating: float | None = Field('imdb_rating')
     genre: list[str] = Field('genre')
     title: str = Field("title")
@@ -71,7 +71,7 @@ class Doc(BaseModel):
 
 
 class Person(BaseModel):
-    uuid: str = Field('id')
+    uuid: str = Field('uuid')
     full_name: str | None = Field('full_name')
     films: list [dict | None] | None = Field('films')
 
@@ -81,7 +81,7 @@ class Person(BaseModel):
 
 
 class Genre(BaseModel):
-    uuid: str = Field('id')
+    uuid: str = Field('uuid')
     name: str | None = Field('name')
 
 
